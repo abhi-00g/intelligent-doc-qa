@@ -63,6 +63,3 @@ PYTHONPATH=src python -m streamlit run src/ui/app.py
 | `CHUNK_SIZE`      | Default: `500`                                    |
 | `TOP_K`           | Chunks retrieved before reranking. Default: `4`   |
 
-## Related work
-
-This project extends the semantic search and document processing work done during my AI Engineer internship at Solix Technologies, where I built a FAISS-based IP record search engine over 10,000+ patent and trademark documents for Fubon Financial clients.
