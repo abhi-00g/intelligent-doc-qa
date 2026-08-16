@@ -1,0 +1,36 @@
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+env/
+venv/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Python packaging
+build/
+dist/
+*.egg-info/
+
+# OS / Editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# FAISS index / data
+data/index/
+data/uploads/
+
+# Env
+.env
+venv/
+data/uploads/
+data/index/
+__pycache__/
+*.pyc
