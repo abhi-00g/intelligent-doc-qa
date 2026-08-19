@@ -1,79 +1,66 @@
+# Intelligent Document Q&A (RAG)
 
-# Intelligent Document Q&A System (RAG)
+A production-grade document intelligence system that lets you upload any PDF and ask questions about it in natural language. Built with a two-stage retrieval pipeline — FAISS vector search followed by cross-encoder reranking — for accurate, grounded answers with source citations.
 
-A Retrieval-Augmented Generation (RAG) app that lets users upload PDFs and ask natural-language questions.  
-It embeds documents with **sentence-transformers**, stores vectors in **FAISS**, retrieves top matches, and asks an **OpenAI-compatible LLM** to answer with sources.
+## Live Demo
+🔗 Live demo: https://intelligent-doc-app-cgqnqenifus7wynsfrq5a9.streamlit.app/
+⚠️ Free-tier hosting — first load may take 1–2 minutes to wake up.
+
+## How it works
+
+1. **Ingest** — PDF is parsed and split into chunks at sentence boundaries (semantic chunking)
+2. **Embed** — Chunks are converted to vector embeddings using `sentence-transformers`
+3. **Index** — Embeddings stored in a FAISS index for fast similarity search
+4. **Retrieve** — Top-k chunks retrieved by vector similarity
+5. **Rerank** — Cross-encoder model (`ms-marco-MiniLM-L-6-v2`) re-scores chunks for true relevance
+6. **Answer** — Gemini 2.5 Flash synthesizes a grounded answer from top chunks with source citations
+
+## Architecture
+
+```
+PDF Upload → Semantic Chunker → Sentence Transformer Embeddings
+→ FAISS Vector Index → Top-K Retrieval → Cross-Encoder Reranker
+→ Gemini 2.5 Flash → Grounded Answer + Source Citations
+```
 
 ## Tech Stack
-- **Python** (3.10+ recommended)
-- **Streamlit** (UI)
-- **FAISS** (vector index)
-- **sentence-transformers** (embeddings)
-- **LangChain** (optional utilities / prompt helpers)
-- **OpenAI** (LLM API)
-- **Docker / Docker Compose** (containerized run)
 
-## Features
-- PDF ingestion → text extraction → chunking
-- Embeddings + FAISS index build
-- Semantic retrieval (top-k)
-- Grounded prompting with sources
-- Streamlit UI for upload & Q&A
-- Dockerized for one-command deployment
+| Layer        | Technology                               |
+|--------------|------------------------------------------|
+| UI           | Streamlit                                |
+| Embeddings   | sentence-transformers (all-MiniLM-L6-v2) |
+| Vector store | FAISS                                    |
+| Reranking    | cross-encoder/ms-marco-MiniLM-L-6-v2     |
+| LLM          | Google Gemini 2.5 Flash (free tier)      |
+| PDF parsing  | pypdf                                    |
 
-## Project Structure
-```
-Intelligent-Doc-QA-RAG/
-├─ src/
-│  ├─ ui/app.py                # Streamlit app
-│  └─ rag/
-│     ├─ config.py             # settings & paths
-│     ├─ loaders.py            # PDF/text loaders
-│     ├─ splitters.py          # text chunking
-│     ├─ embeddings.py         # sentence-transformers
-│     ├─ indexer.py            # FAISS build/save/load
-│     ├─ retriever.py          # semantic search
-│     ├─ llm.py                # OpenAI client + prompt
-│     └─ pipeline.py           # end-to-end helpers
-├─ data/                       # uploaded files + index
-├─ requirements.txt
-├─ Dockerfile
-├─ docker-compose.yml
-├─ .env.example
-└─ README.md
-```
+## What makes this different from a basic RAG demo
 
-## Quickstart (Local)
-1) Create a virtual env and install deps:
+- **Semantic chunking** — splits at sentence boundaries, not arbitrary character limits
+- **Two-stage retrieval** — reranker eliminates irrelevant chunks that pass vector search
+- **Source citations with page numbers** — every answer cites exactly where it came from
+- **Zero cost** — runs entirely on free tier APIs, no credit card required
+
+## Run locally
+
 ```bash
-python3 -m venv .venv
-source .venv/bin/activate
+git clone https://github.com/abhi-00g/intelligent-doc-qa.git
+cd intelligent-doc-qa
+python -m venv venv
+source venv/bin/activate
 pip install -r requirements.txt
-```
-2) Copy `.env.example` to `.env` and set `OPENAI_API_KEY`.
-3) Run the app:
-```bash
-streamlit run src/ui/app.py
-```
-Open the URL Streamlit prints (usually http://localhost:8501).
-
-## Quickstart (Docker)
-```bash
-cp .env.example .env  # fill in your key(s)
-docker compose up --build
-```
-Then open http://localhost:8501.
-
-## Tests
-Basic smoke tests:
-```bash
-pytest -q
+cp .env.example .env
+# Add your GEMINI_API_KEY to .env
+# Get a free key at https://aistudio.google.com/apikey
+PYTHONPATH=src python -m streamlit run src/ui/app.py
 ```
 
-## Notes
-- By default, embeddings are stored under `data/index/` and uploads under `data/uploads/`.
-- You can switch the embedding model in `src/rag/embeddings.py`.
-- LLM model selection lives in `src/rag/llm.py`.
+## Environment variables
 
-## License
-MIT
+| Variable          | Description                                       |
+|-------------------|---------------------------------------------------|
+| `GEMINI_API_KEY`  | Free API key from Google AI Studio                |
+| `EMBEDDING_MODEL` | Default: `sentence-transformers/all-MiniLM-L6-v2` |
+| `CHUNK_SIZE`      | Default: `500`                                    |
+| `TOP_K`           | Chunks retrieved before reranking. Default: `4`   |
+
