@@ -6,6 +6,7 @@ A production-grade document intelligence system that lets you upload any PDF and
 
 🔗 Live demo: https://intelligent-doc-app-cgqnqenifus7wynsfrq5a9.streamlit.app/
 > ⚠️ Free-tier hosting — first load may take 5-7 minutes to wake up.
+> ![Demo](docs/) Demo screenshots are in docs/ folder
 
 ## How it works
 

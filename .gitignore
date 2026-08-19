@@ -34,3 +34,4 @@ data/uploads/
 data/index/
 __pycache__/
 *.pyc
+data/telemetry.json
