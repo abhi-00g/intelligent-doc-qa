@@ -3,8 +3,9 @@
 A production-grade document intelligence system that lets you upload any PDF and ask questions about it in natural language. Built with a two-stage retrieval pipeline — FAISS vector search followed by cross-encoder reranking — for accurate, grounded answers with source citations.
 
 ## Live Demo
+
 🔗 Live demo: https://intelligent-doc-app-cgqnqenifus7wynsfrq5a9.streamlit.app/
-⚠️ Free-tier hosting — first load may take 1–2 minutes to wake up.
+> ⚠️ Free-tier hosting — first load may take 5-7 minutes to wake up.
 
 ## How it works
 
@@ -21,25 +22,69 @@ A production-grade document intelligence system that lets you upload any PDF and
 PDF Upload → Semantic Chunker → Sentence Transformer Embeddings
 → FAISS Vector Index → Top-K Retrieval → Cross-Encoder Reranker
 → Gemini 2.5 Flash → Grounded Answer + Source Citations
+                ↓
+        Telemetry Logger → tokens, cost, latency per call
 ```
 
 ## Tech Stack
 
-| Layer        | Technology                               |
-|--------------|------------------------------------------|
-| UI           | Streamlit                                |
-| Embeddings   | sentence-transformers (all-MiniLM-L6-v2) |
-| Vector store | FAISS                                    |
-| Reranking    | cross-encoder/ms-marco-MiniLM-L-6-v2     |
-| LLM          | Google Gemini 2.5 Flash (free tier)      |
-| PDF parsing  | pypdf                                    |
+| Layer           | Technology                               |
+|-----------------|------------------------------------------|
+| UI              | Streamlit                                |
+| Embeddings      | sentence-transformers (all-MiniLM-L6-v2) |
+| Vector store    | FAISS                                    |
+| Reranking       | cross-encoder/ms-marco-MiniLM-L-6-v2     |
+| LLM             | Google Gemini 2.5 Flash (free tier)      |
+| PDF parsing     | pypdf                                    |
+| Telemetry       | Custom token/cost/latency logger         |
+| CI/CD           | GitHub Actions (pytest)                  |
+| Containerization| Docker + Docker Compose                  |
 
 ## What makes this different from a basic RAG demo
 
+- **Two-stage retrieval** — cross-encoder reranker eliminates irrelevant chunks that pass vector search
 - **Semantic chunking** — splits at sentence boundaries, not arbitrary character limits
-- **Two-stage retrieval** — reranker eliminates irrelevant chunks that pass vector search
 - **Source citations with page numbers** — every answer cites exactly where it came from
+- **Token & cost telemetry** — every LLM call is logged with input/output tokens, estimated cost, and latency
+- **Evaluation harness** — built-in framework to measure retrieval hit rate, keyword recall, and answer coverage
+- **Structured error handling** — corrupt PDFs, rate limits, and empty indexes return user-friendly messages instead of stack traces
 - **Zero cost** — runs entirely on free tier APIs, no credit card required
+
+## Telemetry & Observability
+
+Every Gemini API call is logged with:
+
+- **Input/output token counts** extracted from the response metadata
+- **Estimated cost in USD** based on Gemini 2.5 Flash pricing
+- **Latency in milliseconds** measured end-to-end
+- **Question preview** and status (success/error)
+
+The Streamlit sidebar displays live cumulative stats (total calls, tokens, cost, avg latency), and each answer shows per-query telemetry inline. All data is persisted to `data/telemetry.json`.
+
+## Evaluation
+
+The project includes a built-in evaluation harness (`src/rag/eval.py`) that measures pipeline quality:
+
+- **Retrieval Hit Rate** — % of questions where at least one relevant chunk was retrieved
+- **Keyword Recall** — % of expected keywords found in the generated answer
+- **Answer Coverage** — % of questions that received a non-error, grounded answer
+
+Run an evaluation:
+
+```bash
+# Create an eval set (see sample_eval.json for the format)
+PYTHONPATH=src python -m rag.eval --pdf path/to/document.pdf --eval-set eval_questions.json --output results.json
+```
+
+## Error Handling
+
+The system handles failures gracefully at every stage:
+
+- **Corrupt/empty PDFs** — returns a descriptive error instead of crashing
+- **Gemini rate limits (429)** — displays "Rate limit reached, please wait"
+- **Safety filter blocks** — explains the block and asks the user to rephrase
+- **Missing FAISS index** — prompts the user to upload a document first
+- **Cross-encoder load failure** — falls back to the original vector similarity ranking
 
 ## Run locally
 
@@ -55,6 +100,19 @@ cp .env.example .env
 PYTHONPATH=src python -m streamlit run src/ui/app.py
 ```
 
+## Run with Docker
+
+```bash
+docker compose up --build
+# Open http://localhost:8501
+```
+
+## Run tests
+
+```bash
+PYTHONPATH=src python -m pytest src/tests/ -q
+```
+
 ## Environment variables
 
 | Variable          | Description                                       |
@@ -63,4 +121,3 @@ PYTHONPATH=src python -m streamlit run src/ui/app.py
 | `EMBEDDING_MODEL` | Default: `sentence-transformers/all-MiniLM-L6-v2` |
 | `CHUNK_SIZE`      | Default: `500`                                    |
 | `TOP_K`           | Chunks retrieved before reranking. Default: `4`   |
-
