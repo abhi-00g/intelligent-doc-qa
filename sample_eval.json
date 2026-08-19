@@ -1,0 +1,22 @@
+[
+    {
+        "question": "What is the main topic of this document?",
+        "expected_keywords": []
+    },
+    {
+        "question": "What are the key findings or conclusions?",
+        "expected_keywords": []
+    },
+    {
+        "question": "Who are the authors or organizations mentioned?",
+        "expected_keywords": []
+    },
+    {
+        "question": "What methodology or approach was used?",
+        "expected_keywords": []
+    },
+    {
+        "question": "What recommendations are made?",
+        "expected_keywords": []
+    }
+]

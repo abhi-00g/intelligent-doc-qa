@@ -1,0 +1,46 @@
+[
+  {
+    "timestamp": "2026-08-19T22:24:56.808706+00:00",
+    "model": "gemini-2.5-flash",
+    "input_tokens": 675,
+    "output_tokens": 54,
+    "total_tokens": 729,
+    "cost_usd": 0.000134,
+    "latency_ms": 1380.37,
+    "question_preview": "What is the kernel?",
+    "status": "success"
+  },
+  {
+    "timestamp": "2026-08-19T22:28:18.744028+00:00",
+    "model": "gemini-2.5-flash",
+    "input_tokens": 677,
+    "output_tokens": 34,
+    "total_tokens": 711,
+    "cost_usd": 0.000122,
+    "latency_ms": 1389.16,
+    "question_preview": "What is the Von Neumann architecture?",
+    "status": "success"
+  },
+  {
+    "timestamp": "2026-08-19T22:28:53.737594+00:00",
+    "model": "gemini-2.5-flash",
+    "input_tokens": 520,
+    "output_tokens": 159,
+    "total_tokens": 679,
+    "cost_usd": 0.000173,
+    "latency_ms": 3111.68,
+    "question_preview": "What is the difference between interrupt and polling?",
+    "status": "success"
+  },
+  {
+    "timestamp": "2026-08-19T22:29:24.224528+00:00",
+    "model": "gemini-2.5-flash",
+    "input_tokens": 581,
+    "output_tokens": 61,
+    "total_tokens": 642,
+    "cost_usd": 0.000124,
+    "latency_ms": 1497.12,
+    "question_preview": "Why are interrupts required?",
+    "status": "success"
+  }
+]
