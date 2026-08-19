@@ -3,7 +3,8 @@
 A production-grade document intelligence system that lets you upload any PDF and ask questions about it in natural language. Built with a two-stage retrieval pipeline — FAISS vector search followed by cross-encoder reranking — for accurate, grounded answers with source citations.
 
 ## Live Demo
-🔗 [Try it here](REPLACE_WITH_STREAMLIT_URL)
+🔗 Live demo: https://intelligent-doc-app-cgqnqenifus7wynsfrq5a9.streamlit.app/
+⚠️ Free-tier hosting — first load may take 1–2 minutes to wake up.
 
 ## How it works
 
